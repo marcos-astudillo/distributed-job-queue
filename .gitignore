@@ -33,3 +33,4 @@ docker/*.env
 
 # Misc
 *.tsbuildinfo
+/src/generated/prisma

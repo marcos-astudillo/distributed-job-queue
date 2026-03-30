@@ -4,18 +4,20 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-  "dev": "ts-node-dev --respawn src/server.ts",
-  "build": "tsc",
-  "start": "node dist/server.js"
-},
+    "dev": "ts-node-dev --respawn src/server.ts",
+    "build": "tsc",
+    "start": "node dist/server.js"
+  },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "type": "commonjs",
   "dependencies": {
+    "@prisma/client": "^7.6.0",
     "dotenv": "^17.3.1",
     "fastify": "^5.8.4",
-    "pino": "^10.3.1"
+    "pino": "^10.3.1",
+    "prisma": "^7.6.0"
   },
   "devDependencies": {
     "@types/node": "^25.5.0",
