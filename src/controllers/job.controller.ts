@@ -1,17 +1,16 @@
 import { FastifyRequest, FastifyReply } from "fastify";
 import { CreateJobRequest } from "../models/job.model";
+import { JobRepository } from "../repositories/job.repository";
+
+const jobRepo = new JobRepository();
 
 export const createJob = async (
   request: FastifyRequest<{ Body: CreateJobRequest }>,
   reply: FastifyReply,
 ) => {
-  const body = request.body;
+  const job = await jobRepo.createJob(request.body);
 
-  // TODO: conectar con service
-  return reply.code(201).send({
-    job_id: "mock_job_id",
-    ...body,
-  });
+  return reply.code(201).send(job);
 };
 
 export const leaseJobs = async (
