@@ -27,4 +27,8 @@ export class JobRepository {
       take: limit,
     });
   }
+
+  async getJobById(jobId: string) {
+    return prisma.job.findUnique({ where: { job_id: jobId } });
+  }
 }

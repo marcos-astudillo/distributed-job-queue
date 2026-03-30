@@ -30,9 +30,21 @@ export const leaseJobs = async (
 
   const jobIds = await queueRepo.leaseJobs(limit);
 
-  return {
-    jobs: jobIds.map((id) => ({ job_id: id, visibility_timeout_sec: 30 })),
-  };
+  const jobs = await Promise.all(
+    jobIds.map(async (jobId) => {
+      const job = await jobRepo.getJobById(jobId);
+      if (!job) return null;
+      return {
+        job_id: job.job_id,
+        type: job.type,
+        payload: job.payload,
+        visibility_timeout_sec: 30,
+      };
+    }),
+  );
+
+  // Filtramos nulls
+  return { jobs: jobs.filter(Boolean) };
 };
 
 export const ackJob = async (
