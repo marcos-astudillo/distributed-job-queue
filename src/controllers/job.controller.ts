@@ -2,9 +2,11 @@ import { FastifyRequest, FastifyReply } from "fastify";
 import { CreateJobRequest } from "../models/job.model";
 import { JobRepository } from "../repositories/job.repository";
 import { QueueRepository } from "../repositories/queue.repository";
+import { VisibilityRepository } from "../repositories/visibility.repository";
 
 const jobRepo = new JobRepository();
 const queueRepo = new QueueRepository();
+const visibilityRepo = new VisibilityRepository();
 
 interface JobParams {
   jobId: string;
@@ -34,6 +36,11 @@ export const leaseJobs = async (
 
   const jobIds = await queueRepo.leaseJobs(limit);
 
+  const visibilityTimeoutSec = 30;
+    for (const jobId of jobIds) {
+      await visibilityRepo.markInProgress(jobId, visibilityTimeoutSec);
+  }
+
   const jobs = await Promise.all(
     jobIds.map(async (jobId) => {
       const job = await jobRepo.getJobById(jobId);
@@ -42,12 +49,11 @@ export const leaseJobs = async (
         job_id: job.job_id,
         type: job.type,
         payload: job.payload,
-        visibility_timeout_sec: 30,
+        visibility_timeout_sec: visibilityTimeoutSec,
       };
     }),
   );
 
-  // Filtramos nulls
   return { jobs: jobs.filter(Boolean) };
 };
 
@@ -58,7 +64,6 @@ export const ackJob = async (
 
   await jobRepo.markSucceeded(jobId);
 
-  // opcional: eliminar de Redis si quedara
   await queueRepo.removeFromReady(jobId);
 
   return { status: "acknowledged" };

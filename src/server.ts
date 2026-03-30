@@ -5,11 +5,21 @@ import Fastify from "fastify";
 import { config } from "./config/env";
 import { jobRoutes } from "./routes/job.routes";
 import { prisma } from "./config/prisma";
-
+import { VisibilityRepository } from "./repositories/visibility.repository";
+  
+const visibilityRepo = new VisibilityRepository();  
 const app = Fastify({ logger: true });
 app.register(jobRoutes);
 
 app.get("/health", async () => ({ status: "ok" }));
+
+setInterval(async () => {
+  try {
+    await visibilityRepo.requeueExpiredJobs();
+  } catch (err) {
+    console.error("Error requeueing expired jobs:", err);
+  }
+}, 5000);
 
 const start = async () => {
   try {
