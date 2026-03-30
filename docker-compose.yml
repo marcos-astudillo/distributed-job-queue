@@ -1,17 +1,53 @@
-version: "3.8"
+version: "3.9"
 
 services:
   postgres:
-    image: postgres:15
+    image: postgres:16-alpine
+    container_name: djq_postgres
     restart: always
     environment:
-      POSTGRES_DB: job_queue
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: djq
     ports:
       - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
 
   redis:
-    image: redis:7
+    image: redis:7-alpine
+    container_name: djq_redis
+    restart: always
     ports:
       - "6379:6379"
+
+  backend:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile
+    container_name: djq_backend
+    restart: always
+    ports:
+      - "3000:3000"
+    env_file:
+      - .env
+    depends_on:
+      - postgres
+      - redis
+
+  worker:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile
+    container_name: djq_worker
+    restart: always
+    command: ["npx", "ts-node", "src/worker/worker.ts"]
+    env_file:
+      - .env
+    depends_on:
+      - backend
+      - redis
+      - postgres
+
+volumes:
+  postgres_data:
