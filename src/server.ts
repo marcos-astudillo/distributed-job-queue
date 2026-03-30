@@ -1,9 +1,12 @@
 import Fastify from "fastify";
 import { config } from "./config/env";
+import { jobRoutes } from "./routes/job.routes";
 
 const app = Fastify({
-  logger: true, // usa pino internamente
+  logger: true,
 });
+
+app.register(jobRoutes);
 
 app.get("/health", async () => {
   return { status: "ok" };
