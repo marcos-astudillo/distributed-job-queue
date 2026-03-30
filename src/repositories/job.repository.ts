@@ -31,4 +31,25 @@ export class JobRepository {
   async getJobById(jobId: string) {
     return prisma.job.findUnique({ where: { job_id: jobId } });
   }
+
+  async markSucceeded(jobId: string) {
+    return prisma.job.update({
+      where: { job_id: jobId },
+      data: { state: "succeeded" },
+    });
+  }
+
+  async incrementAttempts(jobId: string) {
+    return prisma.job.update({
+      where: { job_id: jobId },
+      data: { attempts: { increment: 1 } },
+    });
+  }
+
+  async markFailed(jobId: string, lastError: string) {
+    return prisma.job.update({
+      where: { job_id: jobId },
+      data: { state: "failed", last_error: lastError },
+    });
+  }
 }

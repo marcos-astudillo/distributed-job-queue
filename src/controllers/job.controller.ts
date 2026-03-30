@@ -6,6 +6,10 @@ import { QueueRepository } from "../repositories/queue.repository";
 const jobRepo = new JobRepository();
 const queueRepo = new QueueRepository();
 
+interface JobParams {
+  jobId: string;
+}
+
 export const createJob = async (
   request: FastifyRequest<{ Body: CreateJobRequest }>,
   reply: FastifyReply,
@@ -48,15 +52,33 @@ export const leaseJobs = async (
 };
 
 export const ackJob = async (
-  request: FastifyRequest<{ Params: { jobId: string } }>,
-  reply: FastifyReply,
-) => {
+  request: FastifyRequest<{ Params: JobParams }>,
+  reply: FastifyReply) => {
+  const { jobId } = request.params;
+
+  await jobRepo.markSucceeded(jobId);
+
+  // opcional: eliminar de Redis si quedara
+  await queueRepo.removeFromReady(jobId);
+
   return { status: "acknowledged" };
 };
 
 export const nackJob = async (
-  request: FastifyRequest<{ Params: { jobId: string } }>,
+  request: FastifyRequest<{ Params: JobParams }>,
   reply: FastifyReply,
 ) => {
-  return { status: "nacknowledged" };
+  const { jobId } = request.params;
+
+  const job = await jobRepo.incrementAttempts(jobId);
+
+  if (job.attempts >= job.max_attempts) {
+    await queueRepo.addToDLQ(jobId);
+    await jobRepo.markFailed(jobId, "Max attempts reached");
+    return { status: "moved_to_dlq" };
+  } else {
+    const delaySeconds = Math.pow(2, job.attempts);
+    await queueRepo.enqueue(jobId, delaySeconds);
+    return { status: "requeued", delaySeconds };
+  }
 };

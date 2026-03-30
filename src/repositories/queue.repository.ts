@@ -41,4 +41,8 @@ export class QueueRepository {
   async addToDLQ(jobId: string) {
     await redis.lpush(DLQ, jobId);
   }
+
+  async removeFromReady(jobId: string) {
+    await redis.lrem("queue:ready", 0, jobId);
+  }
 }
