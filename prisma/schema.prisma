@@ -1,16 +1,10 @@
-datasource db {
-  provider = "postgresql"
-}
-
 generator client {
   provider = "prisma-client-js"
 }
 
-enum JobState {
-  queued
-  in_progress
-  succeeded
-  failed
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
 }
 
 model Job {
@@ -22,9 +16,15 @@ model Job {
   attempts     Int      @default(0)
   max_attempts Int      @default(3)
   last_error   String?
-
   created_at   DateTime @default(now())
   updated_at   DateTime @updatedAt
 
   @@index([state, run_at])
+}
+
+enum JobState {
+  queued
+  in_progress
+  succeeded
+  failed
 }
