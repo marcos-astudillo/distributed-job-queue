@@ -11,7 +11,12 @@ export const createJob = async (
   reply: FastifyReply,
 ) => {
   const job = await jobRepo.createJob(request.body);
-  await queueRepo.enqueue(job.job_id);
+
+  const delaySeconds = job.run_at
+    ? (new Date(job.run_at).getTime() - Date.now()) / 1000
+    : 0;
+
+  await queueRepo.enqueue(job.job_id, Math.max(delaySeconds, 0));
   return reply.code(201).send(job);
 };
 
