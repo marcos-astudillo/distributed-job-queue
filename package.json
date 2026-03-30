@@ -9,6 +9,7 @@
     "typecheck": "tsc --noEmit",
     "start": "node dist/server.js",
     "test": "vitest run",
+    "test:run": "vitest run",
     "test:watch": "vitest"
   },
   "keywords": [],
