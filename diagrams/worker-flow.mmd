@@ -1,0 +1,16 @@
+sequenceDiagram
+  participant W as Worker
+  participant Q as Queue
+  participant DB as Metadata DB
+
+  W->>Q: Lease job
+  Q-->>W: Job + visibility_timeout
+  W->>DB: mark in_progress
+  W->>W: Process job
+  alt success
+    W->>Q: Ack
+    W->>DB: mark succeeded
+  else failure
+    W->>Q: Nack / let timeout expire
+    W->>DB: record failure + increment attempts
+  end

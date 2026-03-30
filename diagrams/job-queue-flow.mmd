@@ -1,0 +1,38 @@
+flowchart LR
+  subgraph Producers
+    P1[Web] --> API[Fastify API]
+    P2[Backend] --> API
+  end
+
+  subgraph Queue
+    Ready[Ready Queue (Redis List)]
+    Delayed[Delayed Queue (Redis Sorted Set)]
+    InProgress[In-Progress (Redis ZSet)]
+    DLQ[Dead Letter Queue (Redis List)]
+  end
+
+  API --> Ready
+  API --> Delayed
+
+  Worker[Worker Pool] --> InProgress
+  Worker --> Ready
+  Worker --> Delayed
+  Worker --> DLQ
+
+  Ready --> Worker
+  Delayed --> Worker
+  InProgress --> Worker
+
+  subgraph Database
+    Metadata[(PostgreSQL Job Metadata)]
+  end
+
+  Worker --> Metadata
+  API --> Metadata
+
+  subgraph Observability
+    Metrics[Metrics / Monitoring]
+  end
+
+  API --> Metrics
+  Worker --> Metrics

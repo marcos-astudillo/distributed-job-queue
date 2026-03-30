@@ -1,0 +1,8 @@
+flowchart LR
+  P[Producers] --> API[Fastify API]
+  API --> Q[(Redis Queue)]
+  API --> DB[(PostgreSQL Metadata)]
+  W1[Worker Pool] --> Q
+  W2[Worker Pool] --> Q
+  Q --> DLQ[(Dead Letter Queue)]
+  API --> OBS[Metrics / Monitoring]
