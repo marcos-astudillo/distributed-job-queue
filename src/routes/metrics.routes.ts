@@ -42,7 +42,10 @@ export async function metricsRoutes(fastify: FastifyInstance) {
         },
         500: {
           description: "Failed to fetch metrics (Redis unavailable)",
-          $ref: "#/components/schemas/Error",
+          type: "object",
+          properties: {
+            error: { type: "string" },
+          },
         },
       },
     },

@@ -32,8 +32,8 @@ Distributed Job Queue Service provides:
 
 ## Live API
 
-[![Swagger UI](https://img.shields.io/badge/Swagger-UI-85EA2D?style=for-the-badge\&logo=swagger)](http://localhost:3000/docs)
-[![Health Check](https://img.shields.io/badge/Health-Check-success?style=for-the-badge\&logo=railway)](http://localhost:3000/health)
+[![Swagger UI](https://img.shields.io/badge/Swagger-UI-85EA2D?style=for-the-badge\&logo=swagger)](http://https://distributed-job-queue-production.up.railway.app/docs)
+[![Health Check](https://img.shields.io/badge/Health-Check-success?style=for-the-badge\&logo=railway)](http://https://distributed-job-queue-production.up.railway.app/health)
 
 ---
 
