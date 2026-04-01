@@ -41,7 +41,7 @@ services:
       dockerfile: docker/Dockerfile
     container_name: djq_worker
     restart: always
-    command: ["npx", "ts-node", "src/worker/worker.ts"]
+    command: ["node", "dist/worker/worker.js"]
     env_file:
       - .env
     depends_on:

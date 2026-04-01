@@ -1,23 +1,28 @@
-# 1️⃣ Base image
-FROM node:20-alpine
-
-# 2️⃣ Set working directory
+# Stage 1: Build
+FROM node:20-alpine AS builder
 WORKDIR /app
 
-# 3️⃣ Copy package files
 COPY package.json package-lock.json ./
-
-# 4️⃣ Install dependencies
 RUN npm ci
 
-# 5️⃣ Copy source code
-COPY ./src ./src
+COPY tsconfig.json ./
+COPY prisma ./prisma
+COPY src ./src
 
-# 6️⃣ Build TS (opcional si usas ts-node)
-# RUN npm run build
+RUN npx prisma generate
+RUN npm run build
 
-# 7️⃣ Expose port
+# Stage 2: Production
+FROM node:20-alpine
+WORKDIR /app
+
+COPY package.json package-lock.json ./
+RUN npm ci --omit=dev
+
+COPY --from=builder /app/dist ./dist
+COPY --from=builder /app/node_modules/.prisma ./node_modules/.prisma
+COPY prisma ./prisma
+
 EXPOSE 3000
 
-# 8️⃣ Default command: run server
-CMD ["npx", "ts-node", "src/server.ts"]
+CMD ["sh", "-c", "npx prisma migrate deploy && node dist/server.js"]

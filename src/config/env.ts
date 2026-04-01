@@ -2,6 +2,24 @@ import dotenv from "dotenv";
 
 dotenv.config();
 
+function parseRedisConfig() {
+  if (process.env.REDIS_URL) {
+    const url = new URL(process.env.REDIS_URL);
+    return {
+      url: process.env.REDIS_URL,
+      host: url.hostname,
+      port: Number(url.port) || 6379,
+      password: url.password || undefined,
+    };
+  }
+  return {
+    url: undefined,
+    host: process.env.REDIS_HOST || "localhost",
+    port: Number(process.env.REDIS_PORT) || 6379,
+    password: undefined,
+  };
+}
+
 export const config = {
   port: process.env.PORT || 3000,
 
@@ -13,10 +31,7 @@ export const config = {
     password: process.env.POSTGRES_PASSWORD!,
   },
 
-  redis: {
-    host: process.env.REDIS_HOST!,
-    port: Number(process.env.REDIS_PORT),
-  },
+  redis: parseRedisConfig(),
 
   features: {
     dlq: process.env.FEATURE_DLQ === "true",
