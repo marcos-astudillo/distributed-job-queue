@@ -50,7 +50,7 @@ export async function jobRoutes(app: FastifyInstance) {
         },
         response: {
           201: {
-            description: "Job created and enqueued successfully",
+            description: "Job created and enqueued successfully. Initial state is `queued`.",
             $ref: "#/components/schemas/Job",
           },
           400: {

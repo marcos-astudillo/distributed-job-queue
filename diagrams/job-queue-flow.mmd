@@ -5,10 +5,10 @@ flowchart LR
   end
 
   subgraph Queue
-    Ready[Ready Queue (Redis List)]
-    Delayed[Delayed Queue (Redis Sorted Set)]
-    InProgress[In-Progress (Redis ZSet)]
-    DLQ[Dead Letter Queue (Redis List)]
+    Ready["Ready Queue (Redis List)"]
+    Delayed["Delayed Queue (Redis Sorted Set)"]
+    InProgress["In-Progress (Redis ZSet)"]
+    DLQ["Dead Letter Queue (Redis List)"]
   end
 
   API --> Ready
@@ -24,7 +24,7 @@ flowchart LR
   InProgress --> Worker
 
   subgraph Database
-    Metadata[(PostgreSQL Job Metadata)]
+    Metadata[("PostgreSQL Job Metadata")]
   end
 
   Worker --> Metadata

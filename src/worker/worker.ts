@@ -28,9 +28,10 @@ async function workerLoop() {
     for (const job of leased) {
       const success = await processJob(job);
 
+      await visibilityRepo.removeFromInProgress(job.job_id);
+
       if (success) {
         await jobRepo.markSucceeded(job.job_id);
-        await queueRepo.removeFromReady(job.job_id);
         console.log(`[${WORKER_ID}] Job ${job.job_id} succeeded`);
       } else {
         const updatedJob = await jobRepo.incrementAttempts(job.job_id);

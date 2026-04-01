@@ -63,8 +63,7 @@ export const ackJob = async (
   const { jobId } = request.params;
 
   await jobRepo.markSucceeded(jobId);
-
-  await queueRepo.removeFromReady(jobId);
+  await visibilityRepo.removeFromInProgress(jobId);
 
   return { status: "acknowledged" };
 };
@@ -75,6 +74,7 @@ export const nackJob = async (
 ) => {
   const { jobId } = request.params;
 
+  await visibilityRepo.removeFromInProgress(jobId);
   const job = await jobRepo.incrementAttempts(jobId);
 
   if (job.attempts >= job.max_attempts) {

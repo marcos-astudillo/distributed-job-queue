@@ -12,7 +12,14 @@ import fastifySwaggerUI from "@fastify/swagger-ui";
 
   
 const visibilityRepo = new VisibilityRepository();  
-const app = Fastify({ logger: true });
+const app = Fastify({
+  logger: true,
+  ajv: {
+    customOptions: {
+      keywords: ["example"],
+    },
+  },
+});
 app.register(jobRoutes);
 app.register(metricsRoutes);
 
@@ -94,9 +101,9 @@ PENDING → IN_PROGRESS → SUCCEEDED
             },
             state: {
               type: "string",
-              enum: ["PENDING", "IN_PROGRESS", "SUCCEEDED", "FAILED"],
+              enum: ["queued", "in_progress", "succeeded", "failed"],
               description: "Current lifecycle state of the job",
-              example: "PENDING",
+              example: "queued",
             },
             attempts: {
               type: "integer",

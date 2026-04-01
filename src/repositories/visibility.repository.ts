@@ -9,6 +9,10 @@ export class VisibilityRepository {
     await redis.zadd(this.IN_PROGRESS, expireAt, jobId);
   }
 
+  async removeFromInProgress(jobId: string) {
+    await redis.zrem(this.IN_PROGRESS, jobId);
+  }
+
   async requeueExpiredJobs() {
     const now = Date.now();
     const expired = await redis.zrangebyscore(this.IN_PROGRESS, 0, now);
