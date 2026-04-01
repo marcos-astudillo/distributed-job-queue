@@ -11,7 +11,7 @@ import fastifySwagger from "@fastify/swagger";
 import fastifySwaggerUI from "@fastify/swagger-ui";
 
   
-const visibilityRepo = new VisibilityRepository();  
+const visibilityRepo = new VisibilityRepository();
 const app = Fastify({
   logger: true,
   ajv: {
@@ -20,24 +20,6 @@ const app = Fastify({
     },
   },
 });
-app.register(jobRoutes);
-app.register(metricsRoutes);
-
-app.get("/health", {
-  schema: {
-    tags: ["Health"],
-    summary: "Liveness probe",
-    description: "Returns 200 when the server is up. Use this endpoint for load balancer health checks.",
-    response: {
-      200: {
-        type: "object",
-        properties: {
-          status: { type: "string", example: "ok" },
-        },
-      },
-    },
-  },
-}, async () => ({ status: "ok" }));
 
 app.register(fastifySwagger, {
   openapi: {
@@ -51,14 +33,14 @@ REST API for managing a distributed job queue backed by PostgreSQL and Redis.
 Jobs move through the following lifecycle:
 
 \`\`\`
-PENDING → IN_PROGRESS → SUCCEEDED
-                      ↘ FAILED (moved to DLQ after max_attempts)
+queued → in_progress → succeeded
+                     ↘ failed (moved to DLQ after max_attempts)
 \`\`\`
 
 ## Key concepts
 - **Job**: Unit of work with a type, payload, and optional scheduled run time.
 - **Lease**: A worker claims up to N jobs atomically. Each leased job has a visibility timeout (default 30 s); if not acked within that window it becomes available again.
-- **Ack**: Worker reports success — job moves to \`SUCCEEDED\`.
+- **Ack**: Worker reports success — job moves to \`succeeded\`.
 - **Nack**: Worker reports failure — job is retried with exponential backoff or moved to the Dead Letter Queue (DLQ) after exhausting \`max_attempts\`.
 - **DLQ**: Dead Letter Queue holding jobs that have exceeded their retry limit.
       `,
@@ -172,6 +154,25 @@ app.register(fastifySwaggerUI, {
     deepLinking: true,
   },
 });
+
+app.register(jobRoutes);
+app.register(metricsRoutes);
+
+app.get("/health", {
+  schema: {
+    tags: ["Health"],
+    summary: "Liveness probe",
+    description: "Returns 200 when the server is up. Use this endpoint for load balancer health checks.",
+    response: {
+      200: {
+        type: "object",
+        properties: {
+          status: { type: "string", example: "ok" },
+        },
+      },
+    },
+  },
+}, async () => ({ status: "ok" }));
 
 setInterval(async () => {
   try {
