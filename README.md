@@ -35,6 +35,9 @@ Distributed Job Queue Service provides:
 [![Swagger UI](https://img.shields.io/badge/Swagger-UI-85EA2D?style=for-the-badge\&logo=swagger)](http://https://distributed-job-queue-production.up.railway.app/docs)
 [![Health Check](https://img.shields.io/badge/Health-Check-success?style=for-the-badge\&logo=railway)](http://https://distributed-job-queue-production.up.railway.app/health)
 
+### Swagger UI
+![Swagger UI](docs/images/swagger-ui.png)
+
 ---
 
 ## System Design Reference
